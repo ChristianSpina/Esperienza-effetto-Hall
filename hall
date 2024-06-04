@@ -1,0 +1,106 @@
+int main() 
+{
+  init();
+  Serial.begin(9600);
+  delay(1000);
+  Serial2.begin(9600);
+  delay(1000);
+  Serial2.println("V2 30");   //imposta tensione del canale master al max.
+  delay(1000);
+  Serial2.println("I2 5e-2");   //imposta tensione del canale master al max.
+  delay(1000);
+  Serial2.println("OP2 1");
+  delay(500);
+  pinMode(7, OUTPUT); //sets the digital pin 13 as output.
+  delay(500);
+
+  double j=1.2;
+
+  int Y=13;
+  int M=1;
+  int N=50;
+  int Z;
+  int a;
+  int l;
+  int k;
+
+  float V_m_high;
+  float V_m_low;
+  float V_dig_high;
+  float V_dig_low;
+
+  float V_m_high_sum;
+  float V_m_high_mean;
+  float V_m_low_sum;
+  float V_m_low_mean;
+
+  float V_dig_high_sum;
+  float V_dig_high_mean;
+  float V_dig_low_sum;
+  float V_dig_low_mean;
+
+  float Scarto_m_high_sum;
+  float Scarto_m_low_sum;
+  float Scarto_dig_high_sum;
+  float Scarto_dig_low_sum;
+
+  float Sigma_V_m_high;
+  float Sigma_V_m_low;
+  float Sigma_V_dig_high;
+  float Sigma_V_dig_low;
+
+  float Epsilon_V_m_high;
+  float Epsilon_V_m_low;
+  float Epsilon_V_dig_high;
+  float Epsilon_V_dig_low;
+
+  delay(1000);
+
+  //LOOP sui VALORI di CORRENTE del GEN per B.
+  for(int i=0; i<Y;i++)
+  {
+    j=(1.2)-((0.1)*i);
+    Z=0;
+    Serial2.println("I2 " + String(j)); 
+    delay(1000);
+
+    //LOOP sul numero di periodi di onda quadra da generare/aquisire.
+    for(a=0; a<M; a++)
+    {
+      digitalWrite(7,1); //imposto pin digitale ALTO.
+      delay(1000);
+
+      //LOOP sul num di acquisizioni per periodo, ALTO.
+      for(l=0; l<N; l++)
+      {
+        V_m_high = 0.0049 * analogRead(A3) * 1000;
+        Serial.print(V_m_high);
+        Serial.print(" ");
+        analogReference(DEFAULT);
+        Z++;
+      }
+
+      delay(1000);
+
+      //Resetto Z per il prossimo for
+      Z=Z-N+1;
+
+      digitalWrite(7,0); //imposto pin digitale BASSO.
+      delay(1000);
+
+      //LOOP sul num di acquisizioni per periodo, BASSO.
+      for(k=0; k<N; k++)
+      {
+        V_m_low = 0.0049 * analogRead(A3) * 1000;
+        analogReference(DEFAULT); 
+        Serial.print(V_m_low);
+        Serial.print(" ");
+        Z++;
+      }
+      Serial.println("");
+      delay(1000);
+    }
+  }
+    Serial2.println("V1 0");   //imposta tensione del canale master..
+    Serial2.println("I1 0"); //imposta limite in corrente a 0.
+}
